@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Thomas Joseph — Cloud Engineer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#121821;
+    --ink-2:#1a222d;
+    --line:#2b3644;
+    --paper:#eceeec;
+    --paper-2:#dde1de;
+    --amber:#e8a33d;
+    --steel:#6f93b3;
+    --text-dark:#171c22;
+    --text-dim:#5a6472;
+    --ok:#7fb88a;
+    --wip:#e8a33d;
+    --plan:#7a8697;
+    --maxw:920px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--text-dark);
+    font-family:'IBM Plex Sans', sans-serif;
+    line-height:1.55;
+  }
+  h1,h2,h3{
+    font-family:'Space Grotesk', sans-serif;
+    margin:0;
+    letter-spacing:-0.01em;
+  }
+  .mono{
+    font-family:'IBM Plex Mono', monospace;
+  }
+  a{color:inherit;}
+
+  /* ---------- Pipeline rail ---------- */
+  .rail{
+    position:fixed;
+    top:0; left:0;
+    height:100%;
+    width:64px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding:32px 0;
+    z-index:50;
+    pointer-events:none;
+  }
+  .rail-line{
+    position:absolute;
+    top:32px; bottom:32px;
+    left:50%;
+    width:1px;
+    background:var(--line);
+    transform:translateX(-50%);
+  }
+  .rail-dot{
+    position:relative;
+    width:9px; height:9px;
+    border-radius:50%;
+    background:var(--paper-2);
+    border:1px solid var(--text-dim);
+    margin-top:auto;
+    margin-bottom:auto;
+    pointer-events:auto;
+    cursor:pointer;
+    transition:background .25s, border-color .25s, transform .25s;
+  }
+  .rail-dot.active{
+    background:var(--amber);
+    border-color:var(--amber);
+    transform:scale(1.3);
+  }
+  .rail-stages{
+    position:relative;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    height:100%;
+    width:100%;
+    align-items:center;
+  }
+  @media (max-width: 820px){
+    .rail{display:none;}
+  }
+
+  /* ---------- Sections ---------- */
+  section{
+    padding:96px 32px;
+    max-width:var(--maxw);
+    margin:0 auto;
+    padding-left:96px;
+  }
+  @media (max-width: 820px){
+    section{padding-left:32px;}
+  }
+
+  .stage-tag{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    letter-spacing:0.06em;
+    color:var(--text-dim);
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin-bottom:20px;
+  }
+  .stage-tag::before{
+    content:"";
+    width:6px;height:6px;
+    background:var(--amber);
+    display:inline-block;
+  }
+
+  /* ---------- Hero ---------- */
+  #init{
+    background:var(--ink);
+    color:var(--paper);
+    padding-top:120px;
+    padding-bottom:96px;
+    max-width:none;
+    padding-left:96px;
+    padding-right:32px;
+    position:relative;
+    overflow:hidden;
+  }
+  @media (max-width: 820px){ #init{padding-left:32px;} }
+  #init::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    background-image:
+      linear-gradient(var(--line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size:48px 48px;
+    opacity:0.35;
+    mask-image:linear-gradient(to bottom, black, transparent 85%);
+  }
+  .hero-inner{
+    max-width:var(--maxw);
+    position:relative;
+  }
+  .hero-status{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:13px;
+    color:var(--amber);
+    margin-bottom:24px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .pulse{
+    width:8px;height:8px;
+    border-radius:50%;
+    background:var(--amber);
+    box-shadow:0 0 0 0 rgba(232,163,61,0.6);
+    animation:pulse 2s infinite;
+  }
+  @keyframes pulse{
+    0%{box-shadow:0 0 0 0 rgba(232,163,61,0.5);}
+    70%{box-shadow:0 0 0 10px rgba(232,163,61,0);}
+    100%{box-shadow:0 0 0 0 rgba(232,163,61,0);}
+  }
+  #init h1{
+    font-size:clamp(2.6rem, 6vw, 4.4rem);
+    font-weight:600;
+    color:#fff;
+    line-height:1.02;
+  }
+  #init .role{
+    font-size:clamp(1.1rem, 2.4vw, 1.5rem);
+    color:var(--steel);
+    margin-top:14px;
+    font-weight:500;
+  }
+  #init .desc{
+    margin-top:28px;
+    max-width:56ch;
+    color:#c3ccd6;
+    font-size:1.02rem;
+  }
+  .hero-meta{
+    display:flex;
+    gap:28px;
+    margin-top:44px;
+    flex-wrap:wrap;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12.5px;
+    color:#8b97a6;
+  }
+  .hero-meta div span{
+    display:block;
+    color:var(--paper);
+    font-size:14px;
+    margin-top:4px;
+  }
+
+  /* ---------- Profile ---------- */
+  #profile p{
+    font-size:1.05rem;
+    max-width:62ch;
+    color:var(--text-dark);
+  }
+  #profile p + p{margin-top:16px;}
+
+  /* ---------- Stack ---------- */
+  .stack-grid{
+    display:flex;
+    flex-wrap:wrap;
+    gap:14px;
+    margin-top:8px;
+  }
+  .stack-node{
+    border:1px solid #c7cdc8;
+    background:#fff;
+    padding:16px 20px;
+    min-width:140px;
+    position:relative;
+  }
+  .stack-node .name{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:600;
+    font-size:1.05rem;
+  }
+  .stack-node .role{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    color:var(--text-dim);
+    margin-top:4px;
+    text-transform:lowercase;
+  }
+  .stack-connector{
+    display:flex;
+    align-items:center;
+    color:#aab2ab;
+    font-size:14px;
+  }
+  @media (max-width:600px){
+    .stack-connector{display:none;}
+  }
+
+  /* ---------- Cert ---------- */
+  .cert-card{
+    display:flex;
+    gap:20px;
+    align-items:center;
+    border:1px solid #c7cdc8;
+    background:#fff;
+    padding:24px;
+    max-width:520px;
+  }
+  .cert-badge{
+    width:56px; height:56px;
+    flex:none;
+    background:var(--ink);
+    color:var(--amber);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-family:'IBM Plex Mono', monospace;
+    font-weight:600;
+    font-size:11px;
+    text-align:center;
+    line-height:1.2;
+  }
+  .cert-name{font-weight:600; font-size:1.05rem;}
+  .cert-issuer{font-size:13px; color:var(--text-dim); margin-top:2px;}
+
+  /* ---------- Build / Projects ---------- */
+  .project{
+    border:1px solid #c7cdc8;
+    background:#fff;
+    padding:28px;
+    margin-top:20px;
+  }
+  .project-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:16px;
+    flex-wrap:wrap;
+  }
+  .project-title{
+    font-size:1.25rem;
+    font-weight:600;
+  }
+  .status{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    padding:4px 10px;
+    border:1px solid currentColor;
+    white-space:nowrap;
+    letter-spacing:0.03em;
+  }
+  .status.wip{color:#946213; background:#fbeed9;}
+  .status.plan{color:#4d5560; background:#e7e9e6;}
+  .status.done{color:#2f6b3d; background:#e2f0e4;}
+  .project-desc{
+    margin-top:14px;
+    color:var(--text-dark);
+    max-width:64ch;
+  }
+  .tags{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-top:18px;
+  }
+  .tag{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    color:var(--text-dim);
+    border:1px solid #c7cdc8;
+    padding:3px 9px;
+  }
+  .project-flow{
+    margin-top:16px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11.5px;
+    color:var(--steel);
+  }
+
+  /* ---------- Experience ---------- */
+  .exp-item{
+    border-left:2px solid #c7cdc8;
+    padding-left:22px;
+    margin-top:28px;
+    position:relative;
+  }
+  .exp-item::before{
+    content:"";
+    position:absolute;
+    left:-6px; top:4px;
+    width:10px; height:10px;
+    border-radius:50%;
+    background:var(--amber);
+  }
+  .exp-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    flex-wrap:wrap;
+    gap:8px;
+  }
+  .exp-role{
+    font-size:1.1rem;
+    font-weight:600;
+    font-family:'Space Grotesk', sans-serif;
+  }
+  .exp-org{
+    font-size:0.92rem;
+    color:var(--text-dim);
+    margin-top:2px;
+  }
+  .exp-date{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11.5px;
+    color:var(--text-dim);
+    white-space:nowrap;
+  }
+  .exp-desc{
+    margin-top:10px;
+    color:var(--text-dark);
+    max-width:64ch;
+    padding-left:18px;
+  }
+  .exp-desc li{margin-top:4px;}
+
+  /* ---------- Deploy / Contact ---------- */
+  #deploy{
+    background:var(--ink);
+    color:var(--paper);
+    max-width:none;
+    padding-left:96px;
+    padding-right:32px;
+  }
+  @media (max-width: 820px){ #deploy{padding-left:32px;} }
+  #deploy .inner{max-width:var(--maxw);}
+  #deploy h2{
+    color:#fff;
+    font-size:clamp(1.8rem, 4vw, 2.6rem);
+    max-width:16ch;
+  }
+  #deploy p{
+    color:#a9b3bf;
+    margin-top:16px;
+    max-width:50ch;
+  }
+  .deploy-links{
+    display:flex;
+    gap:16px;
+    margin-top:36px;
+    flex-wrap:wrap;
+  }
+  .btn{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:13px;
+    padding:13px 22px;
+    text-decoration:none;
+    border:1px solid var(--amber);
+    color:var(--ink);
+    background:var(--amber);
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    transition:opacity .2s;
+  }
+  .btn:hover{opacity:0.85;}
+  .btn.ghost{
+    background:transparent;
+    color:var(--paper);
+    border:1px solid #445062;
+  }
+  footer{
+    padding:28px 32px 28px 96px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    color:#6b7684;
+    background:var(--ink);
+  }
+  @media (max-width: 820px){ footer{padding-left:32px;} }
+</style>
+</head>
+<body>
+
+<nav class="rail" aria-hidden="true">
+  <div class="rail-stages" id="railStages">
+    <div class="rail-line"></div>
+  </div>
+</nav>
+
+<section id="init">
+  <div class="hero-inner">
+    <div class="hero-status"><span class="pulse"></span> STATUS: LEARNING &amp; BUILDING IN PUBLIC</div>
+    <h1>Thomas Joseph</h1>
+    <div class="role">Cloud Engineer, in training</div>
+    <p class="desc">MS student at the University at Buffalo, building hands-on projects across AWS, containers, and CI/CD to move from cloud fundamentals to production-style deployments.</p>
+    <div class="hero-meta">
+      <div>LOCATION<span>Buffalo, NY</span></div>
+      <div>FOCUS<span>AWS &middot; Docker &middot; IaC</span></div>
+      <div>CERTIFIED<span>AWS Cloud Practitioner</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="profile" data-stage="Profile">
+  <div class="stage-tag">01 &nbsp;PROFILE</div>
+  <h2>About</h2>
+  <p style="margin-top:20px;">I'm currently pursuing my Master's at the University at Buffalo, and treating cloud infrastructure as my main area of self-study — not just reading about it, but standing up real services on AWS and breaking them until I understand why they broke.</p>
+  <p>Right now that means learning the fundamentals — compute, containers, networking, IAM — while building projects that mirror how small production systems actually get deployed and monitored.</p>
+</section>
+
+<section id="stack" data-stage="Stack">
+  <div class="stage-tag">02 &nbsp;STACK</div>
+  <h2>Toolset</h2>
+  <div class="stack-grid">
+    <div class="stack-node"><div class="name">AWS</div><div class="role">cloud platform</div></div>
+    <div class="stack-connector">→</div>
+    <div class="stack-node"><div class="name">Git</div><div class="role">version control</div></div>
+    <div class="stack-connector">→</div>
+    <div class="stack-node"><div class="name">Python</div><div class="role">scripting</div></div>
+    <div class="stack-connector">→</div>
+    <div class="stack-node"><div class="name">Dart</div><div class="role">app development</div></div>
+    <div class="stack-connector">→</div>
+    <div class="stack-node"><div class="name">Figma</div><div class="role">interface design</div></div>
+  </div>
+</section>
+
+<section id="certify" data-stage="Certify">
+  <div class="stage-tag">03 &nbsp;CERTIFY</div>
+  <h2>Certification</h2>
+  <div class="cert-card" style="margin-top:20px;">
+    <div class="cert-badge">AWS<br>CCP</div>
+    <div>
+      <div class="cert-name">AWS Certified Cloud Practitioner</div>
+      <div class="cert-issuer">Amazon Web Services</div>
+    </div>
+  </div>
+</section>
+
+<section id="build" data-stage="Build">
+  <div class="stage-tag">04 &nbsp;BUILD</div>
+  <h2>Projects</h2>
+
+  <div class="project">
+    <div class="project-head">
+      <div class="project-title">Containerized Flask API on AWS</div>
+      <div class="status wip">IN PROGRESS</div>
+    </div>
+    <p class="project-desc">A REST API built with Flask, containerized with Docker, and deployed on AWS using ECR, ECS Fargate, and an Application Load Balancer. Built incrementally to work through containerization, IaC, CI/CD automation, and monitoring one layer at a time.</p>
+    <div class="project-flow">Docker → ECR → ECS Fargate → ALB</div>
+    <div class="tags">
+      <span class="tag">AWS ECS</span>
+      <span class="tag">Docker</span>
+      <span class="tag">ECR</span>
+      <span class="tag">Load Balancer</span>
+      <span class="tag">Flask</span>
+    </div>
+  </div>
+
+  <div class="project">
+    <div class="project-head">
+      <div class="project-title">AI-assisted E-commerce Platform</div>
+      <div class="status done">COMPLETED</div>
+    </div>
+    <p class="project-desc">A full-stack e-commerce application with a Java Spring Boot backend and React frontend, using AI-assisted features, deployed on AWS.</p>
+    <div class="project-flow">React → Spring Boot → AWS</div>
+    <div class="tags">
+      <span class="tag">Java</span>
+      <span class="tag">Spring Boot</span>
+      <span class="tag">React</span>
+      <span class="tag">AWS</span>
+      <span class="tag">AI Integration</span>
+    </div>
+  </div>
+
+  <div class="project">
+    <div class="project-head">
+      <div class="project-title">Image Identifier with AWS Rekognition</div>
+      <div class="status done">COMPLETED</div>
+    </div>
+    <p class="project-desc">An event-driven image recognition application: images land in S3, trigger a Lambda function, and get analyzed with AWS Rekognition, running on EC2.</p>
+    <div class="project-flow">S3 → Lambda → Rekognition → EC2</div>
+    <div class="tags">
+      <span class="tag">AWS Rekognition</span>
+      <span class="tag">S3</span>
+      <span class="tag">Lambda</span>
+      <span class="tag">EC2</span>
+    </div>
+  </div>
+</section>
+
+<section id="experience" data-stage="Experience">
+  <div class="stage-tag">05 &nbsp;EXPERIENCE</div>
+  <h2>Experience</h2>
+
+  <div class="exp-item">
+    <div class="exp-head">
+      <div>
+        <div class="exp-role">Event Intern</div>
+        <div class="exp-org">Student Engagement, University at Buffalo</div>
+      </div>
+      <div class="exp-date">Aug 2026 – Dec 2026</div>
+    </div>
+    <ul class="exp-desc">
+      <li>Support the planning, marketing, and execution of large-scale campus events as part of the Student Engagement office.</li>
+      <li>Coordinate on-site logistics and engage directly with attendees to help deliver a smooth event experience.</li>
+      <li>Participate in weekly staff meetings and training sessions to build leadership and project management skills.</li>
+    </ul>
+  </div>
+
+  <div class="exp-item">
+    <div class="exp-head">
+      <div>
+        <div class="exp-role">Flutter Developer Intern</div>
+        <div class="exp-org">Dart, Flutter</div>
+      </div>
+      <div class="exp-date">2 months</div>
+    </div>
+    <ul class="exp-desc">
+      <li>Built mobile application features using Flutter and Dart over a 2-month internship.</li>
+    </ul>
+  </div>
+</section>
+
+<section id="deploy" data-stage="Deploy">
+  <div class="inner">
+    <div class="stage-tag" style="color:#8b97a6;">06 &nbsp;DEPLOY</div>
+    <h2>Let's connect</h2>
+    <p>Open to internships and entry-level cloud/DevOps roles. Reach out — I reply fast.</p>
+    <div class="deploy-links">
+      <a class="btn" href="https://www.linkedin.com/in/thomas-joseph-64b257245/" target="_blank" rel="noopener">LinkedIn ↗</a>
+      <a class="btn ghost" href="mailto:thomasjosephkusa@gmail.com">Email</a>
+      <a class="btn ghost" href="resume.pdf" target="_blank" rel="noopener">Resume (PDF) ↗</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  Thomas Joseph — Buffalo, NY
+</footer>
+
+<script>
+  const stages = document.querySelectorAll('section[data-stage]');
+  const rail = document.getElementById('railStages');
+  stages.forEach((s, i) => {
+    const dot = document.createElement('div');
+    dot.className = 'rail-dot';
+    dot.title = s.dataset.stage;
+    dot.addEventListener('click', () => s.scrollIntoView({behavior:'smooth'}));
+    rail.appendChild(dot);
+  });
+  const dots = document.querySelectorAll('.rail-dot');
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      const idx = Array.from(stages).indexOf(entry.target);
+      if (entry.isIntersecting) {
+        dots.forEach(d => d.classList.remove('active'));
+        dots[idx].classList.add('active');
+      }
+    });
+  }, {threshold:0.4});
+  stages.forEach(s => io.observe(s));
+</script>
+
+</body>
+</html>
